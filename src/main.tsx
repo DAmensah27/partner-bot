@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Amplify } from 'aws-amplify'
+import { ThemeProvider } from '@aws-amplify/ui-react'
 import '@aws-amplify/ui-react/styles.css'
 import './index.css'
 import App from './App.tsx'
@@ -23,8 +24,12 @@ if (outputs) {
   )
 }
 
+// colorMode="system" makes every Amplify component follow the OS light/dark
+// setting consistently, so fields, labels, and buttons all match the page.
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <ThemeProvider colorMode="system">
+      <App />
+    </ThemeProvider>
   </StrictMode>,
 )

@@ -20,6 +20,12 @@
   align-items: center;
   gap: 0.6rem;
   margin-top: 1.5rem;
+  color: #fff;
+}
+
+/* Question text input only (selects are .amplify-select, unaffected). */
+.amplify-input {
+  color: #fff;
 }
 
 .answer {
