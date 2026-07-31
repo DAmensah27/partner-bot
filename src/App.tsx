@@ -40,17 +40,26 @@ interface ResponseBody {
   meta: Record<string, unknown>
 }
 
-// Stub handler. Logs a contract-shaped request body and returns a fake
-// response after a short delay. Replaced by a real fetch in the next module.
+// Calls the deployed inference API (API Gateway -> Lambda). The endpoint URL
+// comes from a Vite env var (VITE_INFERENCE_API), never hardcoded.
 async function submitQuery(body: RequestBody): Promise<ResponseBody> {
-  console.log('Request:', JSON.stringify(body, null, 2))
-  await new Promise((r) => setTimeout(r, 800))
-  return {
-    answer:
-      `Stub answer for ${body.ticker} ${body.period} ${body.year}. ` +
-      'Replace submitQuery with a real Lambda call in the next module.',
-    meta: {},
+  const endpoint = import.meta.env.VITE_INFERENCE_API
+  if (!endpoint) {
+    throw new Error('VITE_INFERENCE_API is not set. Add it to .env.local.')
   }
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) {
+    // The Lambda returns { error, message } for validation/other failures.
+    throw new Error(data.message || data.error || `Request failed (${response.status}).`)
+  }
+  return data as ResponseBody
 }
 
 export default function App() {
